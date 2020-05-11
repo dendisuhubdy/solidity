@@ -11,6 +11,7 @@ Language Features:
 Compiler Features:
  * Commandline Interface: Don't ignore `--yul-optimizations` in assembly mode.
  * SMTChecker: Support array ``length``.
+ * SMTChecker: Support array ``push`` and ``pop``.
 
 
 
