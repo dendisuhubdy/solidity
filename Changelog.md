@@ -6,6 +6,7 @@ Important Bugfixes:
 
 Language Features:
  * Implemented ``type(X).min`` and ``type(X).max`` for every integer type ``X`` that returns the smallest and largest value representable by the type.
+ * Inline Assembly: EVM instruction `pc()` is marked deprecated and will be removed in the next breaking release.
 
 
 Compiler Features:

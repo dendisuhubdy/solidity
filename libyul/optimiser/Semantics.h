@@ -112,6 +112,20 @@ private:
 	bool m_msizeFound = false;
 };
 
+class PCFinder: public ASTWalker
+{
+public:
+	static bool containsPC(Dialect const& _dialect, Block const& _ast);
+
+	using ASTWalker::operator();
+	void operator()(FunctionCall const& _funCall) override;
+
+private:
+	PCFinder(Dialect const& _dialect): m_dialect(_dialect) {}
+	Dialect const& m_dialect;
+	bool m_PCfound = false;
+};
+
 /**
  * Class that can be used to find out if the given function contains the ``leave`` statement.
  *

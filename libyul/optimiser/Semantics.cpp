@@ -90,6 +90,21 @@ void MSizeFinder::operator()(FunctionCall const& _functionCall)
 			m_msizeFound = true;
 }
 
+bool PCFinder::containsPC(Dialect const& _dialect, Block const& _ast)
+{
+	PCFinder finder(_dialect);
+	finder(_ast);
+	return finder.m_PCfound;
+}
+
+void PCFinder::operator()(FunctionCall const& _functionCall)
+{
+	ASTWalker::operator()(_functionCall);
+
+	if (BuiltinFunction const* f = m_dialect.builtin(_functionCall.functionName.name))
+		if (f->isPC)
+			m_PCfound = true;
+}
 
 map<YulString, SideEffects> SideEffectsPropagator::sideEffects(
 	Dialect const& _dialect,
