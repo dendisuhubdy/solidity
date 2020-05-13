@@ -105,6 +105,7 @@ std::ostream& serr(bool _used = true)
 static string const g_stdinFileNameStr = "<stdin>";
 static string const g_strAbi = "abi";
 static string const g_strAllowPaths = "allow-paths";
+static string const g_strBasePath = "base-path";
 static string const g_strAsm = "asm";
 static string const g_strAsmJson = "asm-json";
 static string const g_strAssemble = "assemble";
@@ -179,6 +180,7 @@ static string const g_strOldReporter = "old-reporter";
 static string const g_argAbi = g_strAbi;
 static string const g_argPrettyJson = g_strPrettyJson;
 static string const g_argAllowPaths = g_strAllowPaths;
+static string const g_argBasePath = g_strBasePath;
 static string const g_argAsm = g_strAsm;
 static string const g_argAsmJson = g_strAsmJson;
 static string const g_argAssemble = g_strAssemble;
@@ -828,6 +830,11 @@ Allowed options)").c_str(),
 			po::value<string>()->value_name("path(s)"),
 			"Allow a given path for imports. A list of paths can be supplied by separating them with a comma."
 		)
+		(
+			g_argBasePath.c_str(),
+			po::value<string>()->value_name("path"),
+			"Allow the given path to be used as base path for relative imports."
+		)
 		(g_argColor.c_str(), "Force colored output.")
 		(g_argNoColor.c_str(), "Explicitly disable colored output, disabling terminal auto-detection.")
 		(g_argOldReporter.c_str(), "Enables old diagnostics reporter.")
@@ -963,6 +970,12 @@ bool CommandLineInterface::processInput()
 			string validPath = _path;
 			if (validPath.find("file://") == 0)
 				validPath.erase(0, 7);
+			else if (validPath[0] == '.' ||
+					(validPath[0] == '/' && !boost::filesystem::exists(validPath)) ||
+					validPath[0] != '/')
+			{
+				validPath = m_basePath.string() + "/" + validPath;
+			}
 			auto path = boost::filesystem::path(validPath);
 			auto canonicalPath = boost::filesystem::weakly_canonical(path);
 			bool isAllowed = false;
@@ -1000,6 +1013,20 @@ bool CommandLineInterface::processInput()
 			return ReadCallback::Result{false, "Unknown exception in read callback."};
 		}
 	};
+
+	if (m_args.count(g_argBasePath))
+	{
+		auto const fspath = boost::filesystem::path(m_args[g_argBasePath].as<string>());;
+		if (!boost::filesystem::is_directory(fspath))
+		{
+			serr() << "Base path must be a directory. \"" << fspath << "\"\n";
+			return false;
+		}
+		else
+		{
+			m_basePath = fspath;
+		}
+	}
 
 	if (m_args.count(g_argAllowPaths))
 	{

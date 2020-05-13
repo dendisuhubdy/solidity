@@ -10,7 +10,7 @@ Language Features:
 
 Compiler Features:
  * Commandline Interface: Don't ignore `--yul-optimizations` in assembly mode.
-
+ * Commandline Interface: Adds new option ``--base-path PATH`` for resolving relative paths when importing files via ``--standard-json``
 
 
 Bugfixes:
